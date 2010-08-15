@@ -755,7 +755,7 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
 
                 case self::ACTION_EXCEPTION:
                 case self::ACTION_TRANSLIT_EXCEPTION:
-                    throw new Zend_FilteR_Exception("Invalid entity {$matches[0]} found");
+                    throw new Zend_Filter_Exception("Invalid entity {$matches[0]} found");
 
                 case self::ACTION_IGNORE:
                 case self::ACTION_TRANSLIT_IGNORE:
