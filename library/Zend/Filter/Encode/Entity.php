@@ -396,7 +396,8 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
             require_once 'Zend/Filter/Exception.php';
             throw new Zend_Filter_Exception(
                 'Invalid entity reference: must be an array '
-              . 'or one of the predefined entity references (special, xml, html)'
+              . 'or one of the predefined entity references: '
+              . implode(', ', array_keys(self::$_entityReferences))
             );
         }
 
