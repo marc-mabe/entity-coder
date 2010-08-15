@@ -329,12 +329,7 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
      */
     public function setInputCharSet($enc)
     {
-        // uppser case UTF-8
-        if (strcasecmp($enc, 'UTF-8') === 0) {
-            $enc = 'UTF-8';
-        }
-
-        $this->_inputCharSet = $enc;
+        $this->_inputCharSet = strtoupper($enc);
         return $this;
     }
 
@@ -356,12 +351,7 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
      */
     public function setOutputCharSet($enc)
     {
-        // uppser case UTF-8
-        if (strcasecmp($enc, 'UTF-8') === 0) {
-            $enc = 'UTF-8';
-        }
-
-        $this->_outputCharSet = $enc;
+        $this->_outputCharSet = strtoupper($enc);
         return $this;
     }
 
