@@ -43,7 +43,7 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
     const ACTION_TRANSLIT_CALLBACK   = 'translitCallback';
     const ACTION_TRANSLIT_IGNORE     = 'translitIgnore';
     const ACTION_TRANSLIT_SUBSTITUTE = 'translitSubstitute';
-    const ACTION_TRANSLIT_ENTITY     = 'translitSubstitute';
+    const ACTION_TRANSLIT_ENTITY     = 'translitEntity';
 
     /**
      * Predefined entity references.
@@ -505,7 +505,7 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
      *
      * @return string Value of Zend_Filter_Encode_Entity::INVALID_ENTITY_*
      */
-    public function getinvalidEntityAction()
+    public function getInvalidEntityAction()
     {
         return $this->_invalidEntityAction;
     }
@@ -897,7 +897,8 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
                     }
 
                     $tmp = (string)@iconv('UTF-8', $iconvTo, $buffer);
-                    if ($tmp === '') {
+                    // íconv feature //TRANSLIT//IGNORE convert not tranlitable characters to "?"
+                    if ($tmp === '' || $tmp === '?') {
                         $outStr.= $this->_handleInvalidChar($buffer);
                     } else {
                         $outStr.= $tmp;

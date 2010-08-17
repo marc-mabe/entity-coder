@@ -114,8 +114,9 @@ class Zend_Filter_Encode_EntityTest extends PHPUnit_Framework_TestCase
         $this->_filter->setInputCharset('UTF-8');
         $this->_filter->setOutputCharset('UTF-8');
 
-        $text     = "\xC3\xA4\xC3\xB6\xC3\xBC - <>&\"'"; // auml + ouml + uuml
-        $expected = "\xC3\xA4\xC3\xB6\xC3\xBC - &#60;&#62;&#38;&#34;&#39;";
+        //           auml       euro
+        $text     = "\xC3\xA4 - \xE2\x82\xAC - <>&\"'";
+        $expected = "\xC3\xA4 - \xE2\x82\xAC - &#60;&#62;&#38;&#34;&#39;";
         $actual   = $this->_filter->encode($text);
         $this->assertEquals($expected, $actual);
     }
@@ -125,8 +126,9 @@ class Zend_Filter_Encode_EntityTest extends PHPUnit_Framework_TestCase
         $this->_filter->setInputCharset('UTF-8');
         $this->_filter->setOutputCharset('ISO-8859-1');
 
-        $text     = "\xC3\xA4\xC3\xB6\xC3\xBC - \xE2\x82\xAC - <>&\"'"; // auml + ouml + uuml + euro
-        $expected = "\xE4\xF6\xFC - &#8364; - &#60;&#62;&#38;&#34;&#39;"; // ISO-8859-1
+        //           auml       euro
+        $text     = "\xC3\xA4 - \xE2\x82\xAC - <>&\"'";
+        $expected = "\xE4 - &#8364; - &#60;&#62;&#38;&#34;&#39;";
         $actual   = $this->_filter->encode($text);
         $this->assertEquals($expected, $actual);
     }
@@ -159,6 +161,30 @@ class Zend_Filter_Encode_EntityTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    public function testDecodeUtf8ToUtf8()
+    {
+        $this->_filter->setInputCharset('UTF-8');
+        $this->_filter->setOutputCharset('UTF-8');
+
+        // euro in different scopes
+        $input    = "\xE2\x82\xAC - &#8364; - &#x20AC; - &#x20ac;";
+        $expected = "\xE2\x82\xAC - \xE2\x82\xAC - \xE2\x82\xAC - \xE2\x82\xAC";
+        $actual   = $this->_filter->decode($input);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testDecodeUtf8ToISO885915()
+    {
+        $this->_filter->setInputCharset('UTF-8');
+        $this->_filter->setOutputCharset('ISO-8859-15');
+
+        // euro in different scopes
+        $input    = "\xE2\x82\xAC - &#8364; - &#x20AC; - &#x20ac;";
+        $expected = "\xA4 - \xA4 - \xA4 - \xA4";
+        $actual   = $this->_filter->decode($input);
+        $this->assertEquals($expected, $actual);
+    }
+
     public function testDecodeOnInvalidCharException()
     {
         $this->_filter->setInputCharset('UTF-8');
@@ -176,13 +202,13 @@ class Zend_Filter_Encode_EntityTest extends PHPUnit_Framework_TestCase
         $this->_filter->setInvalidCharAction(Zend_Filter_Encode_Entity::ACTION_CALLBACK);
         $this->_filter->setInvalidCharCallback(array($this, 'callback_testDecodeOnInvalidCharCallback'));
 
-        $expected = '[2e28ca]';
+        $expected = '[e282ac]';
         $actual   = $this->_filter->decode('&#x20AC;'); // euro
         $this->assertEquals($expected, $actual);
     }
     public function callback_testDecodeOnInvalidCharCallback($char)
     {
-        $tmp = unpack('h*', $char);
+        $tmp = unpack('H*', $char);
         return '[' . $tmp[1] . ']';
     }
 
@@ -238,5 +264,68 @@ class Zend_Filter_Encode_EntityTest extends PHPUnit_Framework_TestCase
         $actual   = $this->_filter->decode('&#x20AC;'); // euro
         $this->assertEquals($expected, $actual);
     }
+
+    public function testDecodeOnInvalidCharTranslitException()
+    {
+        $this->_filter->setInputCharset('UTF-8');
+        $this->_filter->setOutputCharset('ISO-8859-1');
+        $this->_filter->setInvalidCharAction(Zend_Filter_Encode_Entity::ACTION_TRANSLIT_EXCEPTION);
+
+        $this->setExpectedException('Zend_Filter_Exception');
+        $this->_filter->decode('&#x2021;'); // DOUBLE DAGGER
+    }
+
+    public function testDecodeOnInvalidCharTranslitCallback()
+    {
+        $this->_filter->setInputCharset('UTF-8');
+        $this->_filter->setOutputCharset('ISO-8859-1');
+        $this->_filter->setInvalidCharAction(Zend_Filter_Encode_Entity::ACTION_TRANSLIT_CALLBACK);
+        $this->_filter->setInvalidCharCallback(array($this, 'callback_testDecodeOnInvalidCharTranslitCallback'));
+
+        $expected = '[e280a1]';
+        $actual   = $this->_filter->decode('&#x2021;'); // DOUBLE DAGGER
+        $this->assertEquals($expected, $actual);
+    }
+    public function callback_testDecodeOnInvalidCharTranslitCallback($char)
+    {
+        $tmp = unpack('H*', $char);
+        return '[' . $tmp[1] . ']';
+    }
+
+    public function testDecodeOnInvalidCharTranslitSubstitute()
+    {
+        $this->_filter->setInputCharset('UTF-8');
+        $this->_filter->setOutputCharset('ISO-8859-1');
+        $this->_filter->setInvalidCharAction(Zend_Filter_Encode_Entity::ACTION_TRANSLIT_SUBSTITUTE);
+        $this->_filter->setSubstitute('XYZ');
+
+        $expected = 'XYZ';
+        $actual   = $this->_filter->decode('&#x2021;'); // DOUBLE DAGGER
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testDecodeOnInvalidCharTranslitIgnore()
+    {
+        $this->_filter->setInputCharset('UTF-8');
+        $this->_filter->setOutputCharset('ISO-8859-1');
+        $this->_filter->setInvalidCharAction(Zend_Filter_Encode_Entity::ACTION_TRANSLIT_IGNORE);
+
+        $expected = '';
+        $actual   = $this->_filter->decode('&#x2021;'); // DOUBLE DAGGER
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testDecodeOnInvalidCharTranslitEntity()
+    {
+        $this->_filter->setInputCharset('UTF-8');
+        $this->_filter->setOutputCharset('ISO-8859-1');
+        $this->_filter->setInvalidCharAction(Zend_Filter_Encode_Entity::ACTION_TRANSLIT_ENTITY);
+
+        $expected = '&#8225;';
+        $actual   = $this->_filter->decode('&#x2021;'); // DOUBLE DAGGER
+        $this->assertEquals($expected, $actual);
+    }
+
+
 
 }
