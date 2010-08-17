@@ -876,40 +876,37 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
 
         $strLen = strlen($utf8);
         $outStr = '';
-        $buffer = '';
         for ($ptr = 0; $ptr < $strLen; $ptr++) {
-            $byte = $utf8[$ptr];
-            $ord  = ord($byte);
+            $char = $utf8[$ptr];
+            $ord  = ord($char);
             if ($ord > 127) {
                 // Multibyte found (first byte!)
                 if ($ord & 64) {
                     // The first byte must have the 7th bit set!
-                    $buffer = $byte; // Add first byte
                     for ($i = 0; $i < 8; $i++) { // For each byte in MB string
                         $ord = $ord << 1; // Shift char left
                         if ($ord & 128) { // 8th bit
                             // There are still bytes in sequence
-                            $ptr++;
-                            $buffer.= $utf8[$ptr]; // Add the next byte
+                            $char.= $utf8[ ++$ptr ]; // Add the next byte
                         } else {
                             break;
                         }
                     }
 
-                    $tmp = (string)@iconv('UTF-8', $iconvTo, $buffer);
-                    // íconv feature //TRANSLIT//IGNORE convert not tranlitable characters to "?"
+                    $tmp = (string)@iconv('UTF-8', $iconvTo, $char);
+                    // iconv feature //TRANSLIT//IGNORE convert not tranlitable characters to "?"
                     if ($tmp === '' || $tmp === '?') {
-                        $outStr.= $this->_handleInvalidChar($buffer);
+                        $outStr.= $this->_handleInvalidChar($char);
                     } else {
                         $outStr.= $tmp;
                     }
                 } else {
                     // Invalid UTF-8
-                    $outStr.= $this->_handleInvalidChar($byte);
+                    $outStr.= $this->_handleInvalidChar($char);
                 }
             } else {
                 // ASCII (0 - 127)
-                $outStr.= $byte;
+                $outStr.= $char;
             }
         }
 
