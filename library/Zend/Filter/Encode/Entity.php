@@ -49,8 +49,6 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
      * Predefined entity references.
      *
      * @var array
-     * @TODO: define UTF8 using hexadecimal notation
-     * @TODO: use single quotes
      */
     public static $_entityReferences = array(
         /* special entities */
@@ -67,7 +65,7 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
             'lt'   => '<',
             'gt'   => '>',
             'quot' => '"',
-            'apos' => "'", // not available in html
+            'apos' => "'", // not available on html
         ),
 
         /* All HTML 4.0 entities */
@@ -79,26 +77,27 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
             'quot' => '"',
 
             /* latin-1 (since HTML 2.0/3.2) */
-            'nbsp'   => ' ',
-            'iexcl'  => '¡', 'iquest' => '¿',
-            'curren' => '¤', 'cent'   => '¢', 'pound'  => '£', 'yen'    => '¥',
-            'brvbar' => '¦',
-            'sect'   => '§',
-            'uml'    => '¨',
-            'copy'   => '©', 'reg'    => '®',
-            'ordf'   => 'ª', 'ordm'   => 'º',
-            'laquo'  => '«', 'raquo'  => '»',
-            'not'    => '¬',
-            'shy'    => ' ',
-            'macr'   => '¯',
-            'deg'    => '°',
-            'plusmn' => '±',
-            'sup1'   => '¹', 'sup2'   => '²', 'sup3'   => '³',
-            'acute'  => '´',
-            'micro'  => 'µ',
-            'para'   => '¶',
-            'middot' => '·',
-            'cedil'  => '¸',
+            'nbsp'   => "\xc2\xa0",
+            'iexcl'  => "\xc2\xa1", 'iquest' => "\xc2\xbf",
+            'curren' => "\xc2\xa4", 'cent'   => "\xc2\xa2", 'pound' => "\xc2\xa3", 'yen' => "\xc2\xa5",
+            'brvbar' => "\xc2\xa6",
+            'sect'   => "\xc2\xa7",
+            'uml'    => "\xc2\xa8",
+            'copy'   => "\xc2\xa9", 'reg'   => "\xc2\xae",
+            'ordf'   => "\xc2\xaa", 'ordm'  => "\xc2\xba",
+            'laquo'  => "\xc2\xab", 'raquo' => "\xc2\xbb",
+            'not'    => "\xc2\xac",
+            'shy'    => "\xc2\xad",
+            'macr'   => "\xc2\xaf",
+            'deg'    => "\xc2\xb0",
+            'plusmn' => "\xc2\xb1",
+            'sup1'   => "\xc2\xb9", 'sup2' => "\xc2\xb2", 'sup3' => "\xc2\xb3",
+            'acute'  => "\xc2\xb4",
+            'micro'  => "\xc2\xb5",
+            'para'   => "\xc2\xb6",
+            'middot' => "\xc2\xb7",
+            'cedil'  => "\xc2\xb8",
+            // @TODO: define multibyte UTF-8 chars using hexadecimal notation
             'frac14' => '¼', 'frac12' => '½', 'frac34' => '¾',
             'Agrave' => 'À', 'Aacute' => 'Á', 'Acirc'  => 'Â', 'Atilde' => 'Ã', 'Auml'   => 'Ä', 'Aring'  => 'Å', 'AElig'  => 'Æ',
             'agrave' => 'à', 'aacute' => 'á', 'acirc'  => 'â', 'atilde' => 'ã', 'auml'   => 'ä', 'aring'  => 'å', 'aelig'  => 'æ',
@@ -186,7 +185,7 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
             'oline'   => '‾', 'frasl' => '⁄',
             'weierp'  => '℘', 'image' => 'ℑ', 'real'   => 'ℜ',
             'trade'   => '™',
-            'euro'    => '€',
+            'euro'    => "\xe2\x82\xac",
             'alefsym' => 'ℵ',
             'spades'  => '♠', 'clubs' => '♣', 'hearts' => '♥', 'diams' => '♦',
 
