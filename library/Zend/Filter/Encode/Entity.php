@@ -48,7 +48,11 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
     /**
      * Predefined entity references.
      *
-     * @var array
+     * @var array array(
+     *                <string referenceName> => array(
+     *                    <string entityName> => <utf-8 entityValue> [, ...]
+     *                ) [, ...]
+     *            )
      */
     public static $_entityReferences = array(
         /* special entities */
@@ -83,135 +87,133 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
             'brvbar' => "\xc2\xa6",
             'sect'   => "\xc2\xa7",
             'uml'    => "\xc2\xa8",
-            'copy'   => "\xc2\xa9", 'reg'   => "\xc2\xae",
-            'ordf'   => "\xc2\xaa", 'ordm'  => "\xc2\xba",
-            'laquo'  => "\xc2\xab", 'raquo' => "\xc2\xbb",
+            'copy'   => "\xc2\xa9", 'reg'    => "\xc2\xae",
+            'ordf'   => "\xc2\xaa", 'ordm'   => "\xc2\xba",
+            'laquo'  => "\xc2\xab", 'raquo'  => "\xc2\xbb",
             'not'    => "\xc2\xac",
             'shy'    => "\xc2\xad",
             'macr'   => "\xc2\xaf",
             'deg'    => "\xc2\xb0",
             'plusmn' => "\xc2\xb1",
-            'sup1'   => "\xc2\xb9", 'sup2' => "\xc2\xb2", 'sup3' => "\xc2\xb3",
+            'sup1'   => "\xc2\xb9", 'sup2'   => "\xc2\xb2", 'sup3' => "\xc2\xb3",
             'acute'  => "\xc2\xb4",
             'micro'  => "\xc2\xb5",
             'para'   => "\xc2\xb6",
             'middot' => "\xc2\xb7",
             'cedil'  => "\xc2\xb8",
-            // @TODO: define multibyte UTF-8 chars using hexadecimal notation
-            'frac14' => '¼', 'frac12' => '½', 'frac34' => '¾',
-            'Agrave' => 'À', 'Aacute' => 'Á', 'Acirc'  => 'Â', 'Atilde' => 'Ã', 'Auml'   => 'Ä', 'Aring'  => 'Å', 'AElig'  => 'Æ',
-            'agrave' => 'à', 'aacute' => 'á', 'acirc'  => 'â', 'atilde' => 'ã', 'auml'   => 'ä', 'aring'  => 'å', 'aelig'  => 'æ',
-            'Ccedil' => 'Ç', 'ccedil' => 'ç',
-            'Egrave' => 'È', 'Eacute' => 'É', 'Ecirc'  => 'Ê', 'Euml'   => 'Ë',
-            'egrave' => 'è', 'eacute' => 'é', 'ecirc'  => 'ê', 'euml'   => 'ë',
-            'Igrave' => 'Ì', 'Iacute' => 'Í', 'Icirc'  => 'Î', 'Iuml'   => 'Ï',
-            'igrave' => 'ì', 'iacute' => 'í', 'icirc'  => 'î', 'iuml'   => 'ï',
-            'ETH'    => 'Ð', 'eth'    => 'ð',
-            'Ntilde' => 'Ñ',
-            'Ograve' => 'Ò', 'Oacute' => 'Ó', 'Ocirc'  => 'Ô', 'Otilde' => 'Õ', 'Ouml'   => 'Ö',
-            'ograve' => 'ò', 'oacute' => 'ó', 'ocirc'  => 'ô', 'otilde' => 'õ', 'ouml'   => 'ö',
-            'times'  => '×',
-            'Oslash' => 'Ø',
-            'Ugrave' => 'Ù', 'Uacute' => 'Ú', 'Ucirc'  => 'Û', 'Uuml'   => 'Ü',
-            'ugrave' => 'ù', 'uacute' => 'ú', 'ucirc'  => 'û', 'uuml'   => 'ü',
-            'THORN'  => 'Þ', 'thorn'  => 'þ',
-            'szlig'  => 'ß',
-            'ntilde' => 'ñ',
-            'divide' => '÷',
-            'oslash' => 'ø',
-            'Yacute' => 'Ý', 'yacute' => 'ý',
-            'yuml'   => 'ÿ',
-
-            /* greece (since HTML 4.0) */
-            'Alpha'    => 'Α', 'alpha'   => 'α',
-            'Beta'     => 'Β', 'beta'    => 'β',
-            'Gamma'    => 'Γ', 'gamma'   => 'γ',
-            'Delta'    => 'Δ', 'delta'   => 'δ',
-            'Epsilon'  => 'Ε', 'epsilon' => 'ε',
-            'Zeta'     => 'Ζ', 'zeta'    => 'ζ',
-            'Eta'      => 'Η', 'eta'     => 'η',
-            'Theta'    => 'Θ', 'theta'   => 'θ',
-            'Iota'     => 'Ι', 'iota'    => 'ι',
-            'Kappa'    => 'Κ', 'kappa'   => 'κ',
-            'Lambda'   => 'Λ', 'lambda'  => 'λ',
-            'Mu'       => 'Μ', 'mu'      => 'μ',
-            'Nu'       => 'Ν', 'nu'      => 'ν',
-            'Xi'       => 'Ξ', 'xi'      => 'ξ',
-            'Omicron'  => 'Ο', 'omicron' => 'ο',
-            'Pi'       => 'Π', 'pi'      => 'π',
-            'Rho'      => 'Ρ', 'rho'     => 'ρ',
-            'Sigma'    => 'Σ', 'sigma'   => 'σ', 'sigmaf'  => 'ς',
-            'Tau'      => 'Τ', 'tau'     => 'τ',
-            'Upsilon'  => 'Υ', 'upsilon' => 'υ',
-            'Phi'      => 'Φ', 'phi'     => 'φ',
-            'Chi'      => 'Χ', 'chi'     => 'χ',
-            'Psi'      => 'Ψ', 'psi'     => 'ψ',
-            'Omega'    => 'Ω', 'omega'   => 'ω',
-            'thetasym' => 'ϑ',
-            'upsih'    => 'ϒ',
-            'piv'      => 'ϖ',
-
-            /* math (since HTML 4.0) */
-            'forall' => '∀', 'part'  => '∂', 'exist'  => '∃', 'empty' => '∅',
-            'nabla'  => '∇', 'isin'  => '∈', 'notin' => '∉', 'ni'     => '∋',
-            'prod'   => '∏', 'sum'    => '∑', 'minus'  => '−', 'lowast' => '∗',
-            'radic'  => '√', 'prop'   => '∝', 'infin' => '∞', 'ang'    => '∠',
-            'and'    => '∧', 'or'    => '∨',
-            'cap'    => '∩', 'cup'    => '∪',
-            'sub'    => '⊂', 'sup'   => '⊃',
-            'nsub'   => '⊄',
-            'sube'   => '⊆', 'supe'  => '⊇',
-            'int'    => '∫',
-            'there4' => '∴',
-            'sim'    => '∼', 'cong'   => '≅', 'asymp' => '≈',
-            'ne'     => '≠', 'equiv'  => '≡',
-            'le'     => '≤', 'ge'     => '≥',
-            'oplus'  => '⊕', 'otimes' => '⊗',
-            'perp'   => '⊥',
-            'sdot'   => '⋅',
-            'loz'    => '◊',
-
-            /* tech (since HTML 4.0) */
-            'lceil' => '⌈', 'rceil' => '⌉', 'lfloor' => '⌊', 'rfloor' => '⌋',
-            'lang'  => '〈', 'rang'  => '〉',
-
-            /* arrow (since HTML 4.0) */
-            'larr' => '←', 'uarr'  => '↑', 'rarr' => '→',  'darr' => '↓',
-            'harr' => '↔', 'crarr' => '↵',
-            'lArr' => '⇐', 'uArr'  => '⇑', 'rArr' => '⇒', 'dArr' => '⇓', 'hArr' => '⇔',
-
-            /* div (since HTML 4.0) */
-            'bull'    => '•', 'prime' => '′', 'Prime'  => '″',
-            'oline'   => '‾', 'frasl' => '⁄',
-            'weierp'  => '℘', 'image' => 'ℑ', 'real'   => 'ℜ',
-            'trade'   => '™',
-            'euro'    => "\xe2\x82\xac",
-            'alefsym' => 'ℵ',
-            'spades'  => '♠', 'clubs' => '♣', 'hearts' => '♥', 'diams' => '♦',
+            'frac14' => "\xc2\xbc", 'frac12' => "\xc2\xbd", 'frac34' => "\xc2\xbe",
+            'Agrave' => "\xc3\x80", 'Aacute' => "\xc3\x81", 'Acirc'  => "\xc3\x82",
+            'Atilde' => "\xc3\x83", 'Auml'   => "\xc3\x84", 'Aring'  => "\xc3\x85", 'AElig' => "\xc3\x86",
+            'agrave' => "\xc3\xa0", 'aacute' => "\xc3\xa1", 'acirc'  => "\xc3\xa2",
+            'atilde' => "\xc3\xa3", 'auml'   => "\xc3\xa4", 'aring'  => "\xc3\xa5", 'aelig' => "\xc3\xa6",
+            'Ccedil' => "\xc3\x87", 'ccedil' => "\xc3\xa7",
+            'Egrave' => "\xc3\x88", 'Eacute' => "\xc3\x89", 'Ecirc'  => "\xc3\x8a", 'Euml'  => "\xc3\x8b",
+            'egrave' => "\xc3\xa8", 'eacute' => "\xc3\xa9", 'ecirc'  => "\xc3\xaa", 'euml'  => "\xc3\xab",
+            'Igrave' => "\xc3\x8c", 'Iacute' => "\xc3\x8d", 'Icirc'  => "\xc3\x8e", 'Iuml'  => "\xc3\x8f",
+            'igrave' => "\xc3\xac", 'iacute' => "\xc3\xad", 'icirc'  => "\xc3\xae", 'iuml'  => "\xc3\xaf",
+            'ETH'    => "\xc3\x90", 'eth'    => "\xc3\xb0",
+            'Ntilde' => "\xc3\x91", 'ntilde' => "\xc3\xb1",
+            'Ograve' => "\xc3\x92", 'Oacute' => "\xc3\x93", 'Ocirc'  => "\xc3\x94", 'Otilde' => "\xc3\x95", 'Ouml' => "\xc3\x96",
+            'ograve' => "\xc3\xb2", 'oacute' => "\xc3\xb3", 'ocirc'  => "\xc3\xb4", 'otilde' => "\xc3\xb5", 'ouml' => "\xc3\xb6",
+            'times'  => "\xc3\x97",
+            'Oslash' => "\xc3\x98", 'oslash' => "\xc3\xb8",
+            'Ugrave' => "\xc3\x99", 'Uacute' => "\xc3\x9a", 'Ucirc'  => "\xc3\x9b", 'Uuml'   => "\xc3\x9c",
+            'ugrave' => "\xc3\xb9", 'uacute' => "\xc3\xba", 'ucirc'  => "\xc3\xbb", 'uuml'   => "\xc3\xbc",
+            'Yacute' => "\xc3\x9d", 'yacute' => "\xc3\xbd",
+            'THORN'  => "\xc3\x9e", 'thorn'  => "\xc3\xbe",
+            'szlig'  => "\xc3\x9f",
+            'divide' => "\xc3\xb7",
+            'yuml'   => "\xc3\xbf",
 
             /* latin (since HTML 4.0) */
-            'OElig'   => 'Œ', 'oelig'  => 'œ',
-            'Scaron'  => 'Š', 'scaron' => 'š',
-            'Yuml'    => 'Ÿ',
-            'fnof'    => 'ƒ',
+            'OElig'   => "\xc5\x92", 'oelig'  => "\xc5\x93",
+            'Scaron'  => "\xc5\xa0", 'scaron' => "\xc5\xa1",
+            'Yuml'    => "\xc5\xb8",
+            'fnof'    => "\xc6\x92",
+
+            /* greece (since HTML 4.0) */
+            'Alpha'    => "\xce\x91", 'alpha'   => "\xce\xb1",
+            'Beta'     => "\xce\x92", 'beta'    => "\xce\xb2",
+            'Gamma'    => "\xce\x93", 'gamma'   => "\xce\xb3",
+            'Delta'    => "\xce\x94", 'delta'   => "\xce\xb4",
+            'Epsilon'  => "\xce\x95", 'epsilon' => "\xce\xb5",
+            'Zeta'     => "\xce\x96", 'zeta'    => "\xce\xb6",
+            'Eta'      => "\xce\x97", 'eta'     => "\xce\xb7",
+            'Theta'    => "\xce\x98", 'theta'   => "\xce\xb8",
+            'Iota'     => "\xce\x99", 'iota'    => "\xce\xb9",
+            'Kappa'    => "\xce\x9a", 'kappa'   => "\xce\xba",
+            'Lambda'   => "\xce\x9b", 'lambda'  => "\xce\xbb",
+            'Mu'       => "\xce\x9c", 'mu'      => "\xce\xbc",
+            'Nu'       => "\xce\x9d", 'nu'      => "\xce\xbd",
+            'Xi'       => "\xce\x9e", 'xi'      => "\xce\xbe",
+            'Omicron'  => "\xce\x9f", 'omicron' => "\xce\xbf",
+            'Pi'       => "\xce\xa0", 'pi'      => "\xcf\x80",
+            'Rho'      => "\xce\xa1", 'rho'     => "\xcf\x81",
+            'Sigma'    => "\xce\xa3", 'sigma'   => "\xcf\x83", 'sigmaf'  => "\xcf\x82",
+            'Tau'      => "\xce\xa4", 'tau'     => "\xcf\x84",
+            'Upsilon'  => "\xce\xa5", 'upsilon' => "\xcf\x85",
+            'Phi'      => "\xce\xa6", 'phi'     => "\xcf\x86",
+            'Chi'      => "\xce\xa7", 'chi'     => "\xcf\x87",
+            'Psi'      => "\xce\xa8", 'psi'     => "\xcf\x88",
+            'Omega'    => "\xce\xa9", 'omega'   => "\xcf\x89",
+            'thetasym' => "\xcf\x91",
+            'upsih'    => "\xcf\x92",
+            'piv'      => "\xcf\x96",
+
+            /* math (since HTML 4.0) */
+            'forall' => "\xe2\x88\x80", 'part'   => "\xe2\x88\x82", 'exist' => "\xe2\x88\x83", 'empty'  => "\xe2\x88\x85",
+            'nabla'  => "\xe2\x88\x87", 'isin'   => "\xe2\x88\x88", 'notin' => "\xe2\x88\x89", 'ni'     => "\xe2\x88\x8b",
+            'prod'   => "\xe2\x88\x8f", 'sum'    => "\xe2\x88\x91", 'minus' => "\xe2\x88\x92", 'lowast' => "\xe2\x88\x97",
+            'radic'  => "\xe2\x88\x9a", 'prop'   => "\xe2\x88\x9d", 'infin' => "\xe2\x88\x9e", 'ang'    => "\xe2\x88\xa0",
+            'and'    => "\xe2\x88\xa7", 'or'     => "\xe2\x88\xa8",
+            'cap'    => "\xe2\x88\xa9", 'cup'    => "\xe2\x88\xaa",
+            'int'    => "\xe2\x88\xab",
+            'there4' => "\xe2\x88\xb4",
+            'sim'    => "\xe2\x88\xbc", 'cong'   => "\xe2\x89\x85", 'asymp' => "\xe2\x89\x88",
+            'ne'     => "\xe2\x89\xa0", 'equiv'  => "\xe2\x89\xa1",
+            'le'     => "\xe2\x89\xa4", 'ge'     => "\xe2\x89\xa5",
+            'sub'    => "\xe2\x8a\x82", 'sup'    => "\xe2\x8a\x83",
+            'nsub'   => "\xe2\x8a\x84",
+            'sube'   => "\xe2\x8a\x86", 'supe'   => "\xe2\x8a\x87",
+            'oplus'  => "\xe2\x8a\x95", 'otimes' => "\xe2\x8a\x97",
+            'perp'   => "\xe2\x8a\xa5",
+            'sdot'   => "\xe2\x8b\x85",
+            'loz'    => "\xe2\x97\x8a",
+
+            /* tech (since HTML 4.0) */
+            'lceil' => "\xe2\x8c\x88", 'rceil' => "\xe2\x8c\89", 'lfloor' => "\xe2\8c\x8a", 'rfloor' => "\xe2\x8c\x8b",
+            'lang'  => "\xe2\x8c\xa9", 'rang'  => "\xe2\x8c\xaa",
+
+            /* arrow (since HTML 4.0) */
+            'larr'  => "\xe2\x86\x90", 'uarr'  => "\xe2\x86\x91", 'rarr' => "\xe2\x86\x92", 'darr' => "\xe2\x86\x93", 'harr' => "\xe2\x86\x94",
+            'lArr'  => "\xe2\x87\x90", 'uArr'  => "\xe2\x87\x91", 'rArr' => "\xe2\x87\x92", 'dArr' => "\xe2\x87\x93", 'hArr' => "\xe2\x87\x94",
+            'crarr' => "\xe2\x86\xb5",
+
+            /* div (since HTML 4.0) */
+            'bull'    => "\xe2\x80\xa2", 'prime' => "\xe2\x80\xb2", 'Prime'  => "\xe2\x80\xb3",
+            'oline'   => "\xe2\x80\xbe", 'frasl' => "\xe2\x81\x84",
+            'euro'    => "\xe2\x82\xac",
+            'image'   => "\xe2\x84\x91", 'weierp'  => "\xe2\x84\x98", 'real'   => "\xe2\x84\x9c",
+            'trade'   => "\xe2\x84\xa2", 'alefsym' => "\xe2\x84\xb5",
+            'spades'  => "\xe2\x99\xa0", 'clubs'   => "\xe2\x99\xa3", 'hearts' => "\xe2\x99\xa5", 'diams' => "\xe2\x99\xa6",
 
             /* punctuation (since HTML 4.0) */
-            'ensp'    => ' ', 'emsp'  => ' ', 'thinsp' => ' ',
-            'zwnj'    => '‌',  'zwj'   => '‍',
-            'lrm'     => '‎',  'rlm'   => '‏',
-            'ndash'   => '–', 'mdash' => '—',
-            'lsquo'   => '‘', 'rsquo' => '’',
-            'sbquo'   => '‚', // 'bsquo' => '‚',
-            'ldquo'   => '“', 'rdquo' => '”',
-            'bdquo'   => '„',
-            'dagger'  => '†', 'Dagger' => '‡',
-            'hellip'  => '…',
-            'permil'  => '‰',
-            'lsaquo'  => '‹', 'rsaquo' => '›',
+            'ensp'    => "\xe2\x80\x82", 'emsp'  => "\xe2\x80\x83", 'thinsp' => "\xe2\x80\x89",
+            'zwnj'    => "\xe2\x80\x8c", 'zwj'   => "\xe2\x80\x8d",
+            'lrm'     => "\xe2\x80\x8e", 'rlm'   => "\xe2\x80\x8f",
+            'ndash'   => "\xe2\x80\x93", 'mdash' => "\xe2\x80\x94",
+            'lsquo'   => "\xe2\x80\x98", 'rsquo' => "\xe2\x80\x99",
+            'sbquo'   => "\xe2\x80\x9a", // 'bsquo' => "\xe2\x80\x9a",
+            'ldquo'   => "\xe2\x80\x9c", 'rdquo' => "\xe2\x80\x9d",
+            'bdquo'   => "\xe2\x80\x9e",
+            'dagger'  => "\xe2\x80\xa0", 'Dagger' => "\xe2\x80\xa1",
+            'hellip'  => "\xe2\x80\xa6",
+            'permil'  => "\xe2\x80\xb0",
+            'lsaquo'  => "\xe2\x80\xb9", 'rsaquo' => "\xe2\x80\xba",
 
             /* diacritical (since HTML 4.0) */
-            'circ'  => 'ˆ',
-            'tilde' => '˜',
+            'circ'  => "\xcb\x86",
+            'tilde' => "\xcb\x9c",
         ),
     );
 
@@ -238,7 +240,7 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
 
     /**
      * Use hexadecimal or numeric entities for characters not in character reference
-     * and not valit for output char set or special characters.
+     * and not valid for output char set or special characters.
      *
      * @var boolean
      */
@@ -261,7 +263,7 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
 
     /**
      * The callback called on invalid characters
-     * if on_invalid_char is set to callback.
+     * if invalid_char_action is set to callback.
      *
      * @var null|callback
      */
@@ -276,14 +278,14 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
 
     /**
      * The callback called on decode invalid entities
-     * if on_invalid_entity is set to callback.
+     * if invalid_entity_action is set to callback.
      *
      * @var null|callback
      */
     protected $_invalidEntityCallback = null;
 
     /**
-     * The substituting character used with constant INVALID_CHAR_SUBSTITUTE
+     * The substituting character used with one of the substitute action
      *
      * @var string
      */
