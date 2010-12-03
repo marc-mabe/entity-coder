@@ -1,36 +1,26 @@
 <?php
 /**
- * Zend Framework
- *
  * LICENSE
  *
  * This source file is subject to the new BSD license that is bundled
  * with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://framework.zend.com/license/new-bsd
+ * https://github.com/marc-mabe/EntityCoder/blob/master/LICENSE.txt
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
- * to license@zend.com so we can send you a copy immediately.
+ * to license@marc-bennewitz.de so I can send you a copy immediately.
  *
- * @category   Zend
- * @package    Zend_Filter
- * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com)
- * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @version    $Id: HtmlEntities.php 16217 2009-06-21 19:39:00Z thomas $
+ * @copyright  Copyright (c) 2010-2011 Marc Bennewitz
+ * @license    New BSD License
  */
 
-/**
- * @see Zend_Filter_Encode_EncodeInterface
- */
-require_once 'Zend/Filter/Encode/EncodeInterface.php';
+namespace EntityCoder;
 
 /**
- * @category   Zend
- * @package    Zend_Filter
- * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com)
- * @license    http://framework.zend.com/license/new-bsd     New BSD License
+ * @copyright  Copyright (c) 2010-2011 Marc Bennewitz
+ * @license    New BSD License
  */
-class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
+class EntityCoder
 {
 
     const ACTION_EXCEPTION  = 'exception';
@@ -257,7 +247,7 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
     /**
      * The action if an entity can't convert to the given charset
      *
-     * @var string Value of Zend_Filter_Encode_Entity::ACTION_*
+     * @var string Value of EntityCoder\EntityCoder::ACTION_*
      */
     protected $_invalidCharAction = self::ACTION_IGNORE;
 
@@ -272,7 +262,7 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
     /**
      * The action if an invalid or unknown entity was detected on decode.
      *
-     * @var string Value of Zend_Filter_Encode_Entity::ACTION_*
+     * @var string Value of EntityCoder\EntityCoder::ACTION_*
      */
     protected $_invalidEntityAction = self::ACTION_ENTITY;
 
@@ -301,11 +291,10 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
     public function __construct($options = array())
     {
         if (!extension_loaded('iconv')) {
-            require_once 'Zend/Filter/Exception.php';
-            throw new Zend_Filter_Exception('Missing needed ext/iconv');
+            throw new ExtensionNotLoadedException('Missing ext/iconv');
         }
 
-        foreach ($options as $k => $v) {
+	foreach ($options as $k => $v) {
             if (method_exists($this, 'set'.$k)) {
                 $this->{'set'.$k}($v);
             }
@@ -326,7 +315,7 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
      * Set input character set.
      *
      * @param  string $enc
-     * @return Zend_Filter_EntityEncode Provides a fluent interface
+     * @return EntityCoder\EntityCoder Provides a fluent interface
      */
     public function setInputCharSet($enc)
     {
@@ -348,7 +337,7 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
      * Set output character set.
      *
      * @param  string $enc
-     * @return Zend_Filter_EntityEncode Provides a fluent interface
+     * @return EntityCoder\EntityCoder Provides a fluent interface
      */
     public function setOutputCharSet($enc)
     {
@@ -372,20 +361,18 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
      *    or:  name of a predefined entity reference
      *
      * @param array|string $entityReference Entity reference.
-     * @return Zend_Filter_EntityEncode Provides a fluent interface
+     * @return EntityCoder\EntityCoder Provides a fluent interface
      */
     public function setEntityReference($entityReference) {
         if (is_string($entityReference)) {
             if (!isset(self::$_entityReferences[$entityReference])) {
-                require_once 'Zend/Filter/Exception.php';
-                throw new Zend_Filter_Exception("Unknown entity reference '{$entityReference}'");
+                throw new InvalidArgumentException("Unknown entity reference '{$entityReference}'");
             }
             $this->_entityReference = self::$_entityReferences[$entityReference];
         } elseif (is_array($entityReference)) {
             $this->_entityReference = $entityReference;
         } else {
-            require_once 'Zend/Filter/Exception.php';
-            throw new Zend_Filter_Exception(
+            throw new InvalidArgumentException(
                 'Invalid entity reference: must be an array '
               . 'or one of the predefined entity references: '
               . implode(', ', array_keys(self::$_entityReferences))
@@ -408,7 +395,7 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
      * Sets the hex option.
      *
      * @param bool $flag
-     * @return Zend_Filter_EntityEncode Provides a fluent interface
+     * @return EntityCoder\EntityCoder Provides a fluent interface
      */
     public function setHex($flag) {
         $this->_hex = (bool)$flag;
@@ -429,7 +416,7 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
      * Sets keep special option
      *
      * @param bool $flag
-     * @return Zend_Filter_Encode_Entity Provides a fluent interface
+     * @return EntityCoder\EntityCoder Provides a fluent interface
      */
     public function setKeepSpecial($flag)
     {
@@ -440,7 +427,7 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
     /**
      * Get the action which is done if an invalid character was detected.
      *
-     * @return string Value of Zend_Filter_Encode_Entity::INVALID_CHAR_*
+     * @return string Value of EntityCoder\EntityCoder::INVALID_CHAR_*
      */
     public function getInvalidCharAction()
     {
@@ -450,9 +437,9 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
     /**
      * Set the action which is done if an invalid character was detected.
      *
-     * @param string $action The action to set - value of Zend_Filter_Encode_Entity::INVALID_CHAR_*
-     * @return Zend_Filter_Encode_Entity Provides a fluent interface
-     * @throws Zend_Filter_Exception If an unknown $action was given.
+     * @param string $action The action to set - value of EntityCoder\EntityCoder::INVALID_CHAR_*
+     * @return EntityCoder\EntityCoder Provides a fluent interface
+     * @throws EntityCoder\InvalidArgumentException If an unknown $action was given.
      */
     public function setInvalidCharAction($action)
     {
@@ -466,8 +453,7 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
         );
 
         if (!in_array($action, $actions)) {
-            require_once 'Zend/Filter/Exception.php';
-            throw new Zend_Filter_Exception("Unknown action '{$action}'");
+            throw new InvalidArgumentException("Unknown action '{$action}'");
         }
         $this->_invalidCharAction = $action;
 
@@ -488,14 +474,13 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
      * Set the callback for invalid characters.
      *
      * @param null|callback $callback
-     * @return Zend_Filter_Encode_Entity Provides a fluent interface
-     * @throws Zend_Filter_Exception If an invalid callback was given.
+     * @return EntityCoder\EntityCoder Provides a fluent interface
+     * @throws EntityCoder\InvalidArgumentException If an invalid callback was given.
      */
     public function setInvalidCharCallback($callback)
     {
         if ($callback !== null && !is_callable($callback)) {
-            require_once 'Zend/Filter/Exception.php';
-            throw new Zend_Filter_Exception('Invalid calllback given');
+            throw new InvalidArgumentException('Invalid calllback given');
         }
 
         $this->_invalidCharCallback = $callback;
@@ -504,7 +489,7 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
     /**
      * Get the action which is done if an invalid or unknown entity was detected.
      *
-     * @return string Value of Zend_Filter_Encode_Entity::INVALID_ENTITY_*
+     * @return string Value of EntityCoder\EntityCoder::INVALID_ENTITY_*
      */
     public function getInvalidEntityAction()
     {
@@ -514,9 +499,9 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
     /**
      * Set the action which is done if an invalid or unknown entity was detected.
      *
-     * @param string $action Value of Zend_Filter_Encode_Entity::INVALID_ENTITY_*
-     * @return Zend_Filter_Encode_Entity Provides a fluent interface
-     * @throws Zend_Filter_Exception If an unknown $action was given.
+     * @param string $action Value of EntityCoder\EntityCoder::INVALID_ENTITY_*
+     * @return EntityCoder\EntityCoder Provides a fluent interface
+     * @throws EntityCoder\InvalidArgumentException If an unknown $action was given.
      */
     public function setInvalidEntityAction($action)
     {
@@ -530,8 +515,7 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
         );
 
         if (!in_array($action, $actions)) {
-            require_once 'Zend/Filter/Exception.php';
-            throw new Zend_Filter_Exception("Unknown action '{$action}'");
+            throw new InvalidArgumentException("Unknown action '{$action}'");
         }
         $this->_invalidEntityAction = $action;
 
@@ -554,7 +538,7 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
      * Set the substituting string.
      *
      * @param string $substitute
-     * @return Zend_Filter_Encode_Entity Provides a fluent interface
+     * @return EntityCoder\EntityCoder Provides a fluent interface
      */
     public function setSubstitute($substitute) {
         $this->_substitute = (string)$substitute;
@@ -713,7 +697,7 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
 
                 case self::ACTION_EXCEPTION:
                 case self::ACTION_TRANSLIT_EXCEPTION:
-                    throw new Zend_Filter_Exception("Invalid entity {$matches[0]} found");
+                    throw new InvalidEntityException("Invalid entity {$matches[0]} found");
 
                 case self::ACTION_IGNORE:
                 case self::ACTION_TRANSLIT_IGNORE:
@@ -757,7 +741,7 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
 
                 case self::ACTION_EXCEPTION:
                 case self::ACTION_TRANSLIT_EXCEPTION:
-                    throw new Zend_Filter_Exception("Invalid entity {$matches[0]} found");
+                    throw new InvalidEntityException("Invalid entity {$matches[0]} found");
 
                 case self::ACTION_IGNORE:
                 case self::ACTION_TRANSLIT_IGNORE:
@@ -931,7 +915,9 @@ class Zend_Filter_Encode_Entity implements Zend_Filter_Encode_EncodeInterface
             case self::ACTION_EXCEPTION:
             case self::ACTION_TRANSLIT_EXCEPTION:
                 $hex = dechex(bindec($char));
-                throw new Zend_FilteR_Exception("Can't convert UTF-8 character '{$char}' (hex: {$hex}) to '{$this->getOutputCharSet()}'");
+                throw new InvalidCharacterException(
+                    "Can't convert UTF-8 character '{$char}' ({$hex}) to '{$this->getOutputCharSet()}'"
+                );
 
             case self::ACTION_IGNORE:
             case self::ACTION_TRANSLIT_IGNORE:
