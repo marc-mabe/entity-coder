@@ -5,6 +5,7 @@ FEATURES
 
   * decode and encode hex entities
   * decode and encode decimal entities
+  * convert from one charset to another
   * selectable if named entities will be used (on encode)
   * selectable if hex or decimal entities will be used (on encode)
   * selectable how to handle characters/entities which are not convertable to given output charset
