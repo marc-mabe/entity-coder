@@ -188,16 +188,14 @@ class EntityCoderTest extends \PHPUnit_Framework_TestCase
         $this->_filter->setInputCharset('UTF-8');
         $this->_filter->setOutputCharset('ISO-8859-1');
         $this->_filter->setInvalidCharAction(\EntityCoder\EntityCoder::ACTION_CALLBACK);
-        $this->_filter->setInvalidCharCallback(array($this, 'callback_testDecodeOnInvalidCharCallback'));
+        $this->_filter->setInvalidCharCallback(function ($char) {
+            $tmp = unpack('H*', $char);
+            return '[' . $tmp[1] . ']';
+        });
 
         $expected = '[e282ac]';
         $actual   = $this->_filter->decode('&#x20AC;'); // euro
         $this->assertEquals($expected, $actual);
-    }
-    public function callback_testDecodeOnInvalidCharCallback($char)
-    {
-        $tmp = unpack('H*', $char);
-        return '[' . $tmp[1] . ']';
     }
 
     public function testDecodeOnInvalidCharSubstitute()
@@ -268,16 +266,14 @@ class EntityCoderTest extends \PHPUnit_Framework_TestCase
         $this->_filter->setInputCharset('UTF-8');
         $this->_filter->setOutputCharset('ISO-8859-1');
         $this->_filter->setInvalidCharAction(\EntityCoder\EntityCoder::ACTION_TRANSLIT_CALLBACK);
-        $this->_filter->setInvalidCharCallback(array($this, 'callback_testDecodeOnInvalidCharTranslitCallback'));
+        $this->_filter->setInvalidCharCallback(function ($char) {
+            $tmp = unpack('H*', $char);
+            return '[' . $tmp[1] . ']';
+        });
 
-        $expected = '[e280a1]';
-        $actual   = $this->_filter->decode('&#x2021;'); // DOUBLE DAGGER
+        $expected = 'EUR [e280a1]';
+        $actual   = $this->_filter->decode('&#8364; &#x2021;'); // euro + DOUBLE DAGGER
         $this->assertEquals($expected, $actual);
-    }
-    public function callback_testDecodeOnInvalidCharTranslitCallback($char)
-    {
-        $tmp = unpack('H*', $char);
-        return '[' . $tmp[1] . ']';
     }
 
     public function testDecodeOnInvalidCharTranslitSubstitute()
