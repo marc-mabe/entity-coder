@@ -588,15 +588,14 @@ class EntityCoder
         // on converting to output charset we create entities only if character can't be converted.
         if ( $this->getOutputCharSet() != 'UTF-8') {
             // convert multibyte characters if they are not available on output encoding
-
             $text = preg_replace_callback(
                 '/('
                 . '[\xc0-\xdf][\x80-\xbf]'     // 2 bytes (110xxxxx 10xxxxxx)
-                . '|[\xe0-\xef][\x80-\xbf]{2}' // or 3 bytes (1110xxxx [10xxxxxx, ...])
-                . '|[\xf0-\xf7][\x80-\xbf]{3}' // or 4 bytes (11110xxx [10xxxxxx, ...])
-                . '|[\xf8-\xfb][\x80-\xbf]{4}' // or 5 bytes (111110xx [10xxxxxx, ...])
-                . '|[\xfd-\xfe][\x80-\xbf]{5}' // or 6 bytes (1111110x [10xxxxxx, ...])
-                . '|\xfe[\x80-\xbf]{6}'        // or 7 bytes (11111110 [10xxxxxx, ...])
+                . '|[\xe0-\xef][\x80-\xbf]{2}' // 3 bytes (1110xxxx [10xxxxxx, ...])
+                . '|[\xf0-\xf7][\x80-\xbf]{3}' // 4 bytes (11110xxx [10xxxxxx, ...])
+                . '|[\xf8-\xfb][\x80-\xbf]{4}' // 5 bytes (111110xx [10xxxxxx, ...])
+                . '|[\xfd-\xfe][\x80-\xbf]{5}' // 6 bytes (1111110x [10xxxxxx, ...])
+                . '|\xfe[\x80-\xbf]{6}'        // 7 bytes (11111110 [10xxxxxx, ...])
                 . ')/s',
                 array($this, '_encodeMultibyteMatches'),
                 $text
@@ -609,14 +608,18 @@ class EntityCoder
         return $text;
     }
 
-    protected function _encodeMultibyteMatches(array $matches)
+    protected function _encodeMultibyteMatches(array &$matches)
     {
-        $char = (string)@iconv('UTF-8', $this->getOutputCharSet().'//IGNORE', $matches[1]);
-        if ($char !== '') {
-            return $matches[1];
+        $char = &$matches[1];
+
+        if ( ($outputEncoding = $this->getOutputCharSet()) != 'UTF-8') {
+            $conv = (string)@iconv('UTF-8', $this->getOutputCharSet() . '//IGNORE', $char);
+            if ($conv !== '') {
+                return $char;
+            }
         }
 
-        return $this->_unicodeToEntity($this->_utf8ToUnicode($matches[1]));
+        return $this->_unicodeToEntity($this->_utf8ToUnicode($char));
     }
 
     /**
@@ -668,7 +671,7 @@ class EntityCoder
         return $text;
     }
 
-    protected function _filterNumEntityMatches(array $matches) {
+    protected function _filterNumEntityMatches(array &$matches) {
         $unicode = (int)$matches[1];
 
         if ($this->getKeepSpecial()
@@ -679,13 +682,12 @@ class EntityCoder
             || $unicode == 62 // >
           )
         ) {
-            return $matches[0];
+            return $matches[0]; // return entity
         }
 
         $char = $this->_unicodeToUtf8($unicode);
-        if (!isset($char[0])) {
-            $invalidEntityAction = $this->getInvalidEntityAction();
-            switch ($invalidEntityAction) {
+        if ($char === '') {
+            switch ($this->getInvalidEntityAction()) {
                 case self::ACTION_CALLBACK:
                 case self::ACTION_TRANSLIT_CALLBACK:
                     $callback = $this->getInvalidEntityCallback();
@@ -712,7 +714,7 @@ class EntityCoder
         return $char;
     }
 
-    protected function _filterHexEntityMatches(array $matches) {
+    protected function _filterHexEntityMatches(array &$matches) {
         $unicode = hexdec($matches[1]);
 
         if ($this->getKeepSpecial()
@@ -727,9 +729,8 @@ class EntityCoder
         }
 
         $char = $this->_unicodeToUtf8($unicode);
-        if (!isset($char[0])) {
-            $invalidEntityAction = $this->getInvalidEntityAction();
-            switch ($invalidEntityAction) {
+        if ($char === '') {
+            switch ($this->getInvalidEntityAction()) {
                 case self::ACTION_CALLBACK:
                 case self::ACTION_TRANSLIT_CALLBACK:
                     $callback = $this->getInvalidEntityCallback();
@@ -824,8 +825,7 @@ class EntityCoder
             return $input;
         }
 
-        $invalidCharAction = $this->getInvalidCharAction();
-        switch ($invalidCharAction) {
+        switch ($this->getInvalidCharAction()) {
             case self::ACTION_TRANSLIT_CALLBACK:
             case self::ACTION_TRANSLIT_ENTITY:
             case self::ACTION_TRANSLIT_EXCEPTION:
