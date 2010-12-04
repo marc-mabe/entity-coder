@@ -764,22 +764,27 @@ class EntityCoder
 
     protected function _utf8ToUnicode($char)
     {
-        $ord = ord($char[0]); // first byte
-        if (($ord & 192) != 192) {
-            return $ord; // not a multibyte character
+        $ord0 = ord($char[0]); // first byte
+        if (($ord0 & 192) != 192) {
+            return $ord0; // not a multibyte character
         }
 
-        $binBuf = '';
-        for ($i = 0; $i < 8; $i++) {
-            $ord = $ord << 1;  // shift it left
-            if ($ord & 128) {  // if 8th bit is set, there are still bytes in sequence.
-                $binBuf.= substr('00000000' . decbin(ord($char[$i+1])), -6);
+        $unicode = 0;
+        $marker  = $ord0;
+        for ($i = 1; $i <= 8; $i++) {
+            $marker = $marker << 1;  // shift it left
+            if ($marker & 128) {  // 8th bit is set -> there are still bytes in sequence.
+                // merge multibyte bits
+                $unicode = ($unicode << 6) + ord($char[$i]) - 128;
             } else {
                 break;
             }
         }
-        $binBuf = substr('00000000' . decbin(ord($char[0])), -(6-$i)) . $binBuf;
-        return bindec($binBuf);
+
+        $bits = (($marker & 255) >> $i); // unicode bits of first byte
+        $bits = $bits << (($i-1) * 6);   // shift left up to length
+        $unicode = $bits | $unicode;     // set multibyte bits
+        return $unicode;
     }
 
     protected function _unicodeToUtf8($unicode) {
