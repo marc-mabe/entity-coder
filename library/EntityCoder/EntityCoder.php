@@ -825,8 +825,7 @@ class EntityCoder
 
     protected function _inputToUtf8($input)
     {
-        $from = $this->getInputCharSet();
-        if ($input === '' || $from == 'UTF-8') {
+        if ($input === '' || ($from = $this->getInputCharSet()) == 'UTF-8') {
             return $input;
         }
 
