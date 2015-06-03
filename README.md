@@ -1,4 +1,5 @@
 EntityCoder
+===========
 
 FEATURES
 --------
@@ -23,7 +24,7 @@ FEATURES
 REQUIREMENTS
 ------------
 
-The EntityCoder requires PHP 5.3.0 or later.
+This library requires PHP 5.3.0 or later.
 Additionally the php extension iconv is needed. (enabled by default)
 
 
@@ -32,7 +33,7 @@ DOCUMENTATION
 
 Online documentation can be found at:
 
-https://github.com/marc-mabe/EntityCoder/wiki.
+https://github.com/marc-mabe/entity-coder/wiki.
 
 
 ISSUES AND FEEDBACK
@@ -42,7 +43,7 @@ If you find code in this release behaving in an unexpected manner or
 contrary to its documented behavior, please create an issue in the
 GitHub issue tracker at:
 
-https://github.com/marc-mabe/EntityCoder/issues
+https://github.com/marc-mabe/entity-coder/issues
 
 
 LICENSE
