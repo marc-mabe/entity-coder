@@ -16,7 +16,7 @@
     }],
     "license": "BSD-3-Clause",
     "require": {
-        "php":       ">=5.2",
+        "php":       ">=5.3",
         "ext-iconv": "*"
     },
     "require-dev": {
