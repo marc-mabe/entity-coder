@@ -671,7 +671,7 @@ class EntityCoder
         return $text;
     }
 
-    protected function _filterNumEntityMatches(array &$matches) {
+    protected function _filterNumEntityMatches(array $matches) {
         $unicode = (int)$matches[1];
 
         if ($this->getKeepSpecial()
@@ -714,7 +714,7 @@ class EntityCoder
         return $char;
     }
 
-    protected function _filterHexEntityMatches(array &$matches) {
+    protected function _filterHexEntityMatches(array $matches) {
         $unicode = hexdec($matches[1]);
 
         if ($this->getKeepSpecial()
