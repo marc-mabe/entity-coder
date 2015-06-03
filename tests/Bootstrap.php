@@ -14,27 +14,6 @@
  * @license    New BSD License
  */
 
-/*
- * Set error reporting
- */
-error_reporting( E_ALL | E_STRICT );
+error_reporting(E_ALL | E_STRICT);
 
-/*
- * Setup autoloading
- */
-spl_autoload_register(function ($class) {
-    $class = ltrim($class, '\\');
-    $nsParts = explode('\\', $class);
-    
-    if ($nsParts[0] != 'EntityCoder') {
-        return false;
-    }
-    
-    if (substr($nsParts[0], -5) == 'Tests') {
-        $dir = __DIR__;
-    } else {
-        $dir = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'library';
-    }
-    
-    return include_once($dir . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $nsParts) . '.php');
-}, true, true);
+include dirname(__FILE__) . '/../vendor/autoload.php';

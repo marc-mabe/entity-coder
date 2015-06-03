@@ -1,0 +1,36 @@
+{
+    "name": "marc-mabe/entity-coder",
+    "description": "Encode & decode XML, HTML and own defined entities into different charsets",
+    "type": "library",
+    "keywords": [
+        "entity",
+        "XML",
+        "HTML"
+    ],
+    "homepage": "https://github.com/marc-mabe/EntityCoder",
+    "authors": [{
+        "name":     "Marc Bennewitz",
+        "email":    "dev@mabe.berlin",
+        "homepage": "http://mabe.berlin/",
+        "role":     "Lead"
+    }],
+    "license": "BSD-3-Clause",
+    "require": {
+        "php":       ">=5.2",
+        "ext-iconv": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "EntityCoder\\": "library/EntityCoder"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "EntityCoderTests\\": "tests/EntityCoderTests"
+        }
+    }
+}
+
