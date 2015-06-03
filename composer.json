@@ -24,12 +24,12 @@
     },
     "autoload": {
         "psr-4": {
-            "EntityCoder\\": "library/EntityCoder"
+            "EntityCoder\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "EntityCoderTests\\": "tests/EntityCoderTests"
+            "EntityCoderTests\\": "tests/"
         }
     }
 }
