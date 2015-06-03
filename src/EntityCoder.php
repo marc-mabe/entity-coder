@@ -608,7 +608,7 @@ class EntityCoder
         return $text;
     }
 
-    protected function _encodeMultibyteMatches(array &$matches)
+    protected function _encodeMultibyteMatches(array $matches)
     {
         $char = &$matches[1];
 
