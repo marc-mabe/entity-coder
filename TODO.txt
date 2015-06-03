@@ -1,6 +1,0 @@
-EntityCoder
-
-TODOs
------
-
-  * Port of Zend Framework 2
