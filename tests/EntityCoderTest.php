@@ -16,6 +16,8 @@
 
 namespace EntityCoderTests;
 
+use EntityCoder\EntityCoder;
+
 /**
  * @copyright  Copyright (c) 2010-2011 Marc Bennewitz
  * @license    New BSD License
@@ -28,12 +30,12 @@ class EntityCoderTest extends \PHPUnit_Framework_TestCase
     {
         if (!extension_loaded('iconv')) {
             $this->setExpectedException('EntityCoder\ExtensionNotLoadedException');
-            new \EntityCoder\EntityCoder();
+            new EntityCoder();
 
             $this->markTestSkipped("Missing needed ext/iconv");
         }
 
-        $this->_filter = new \EntityCoder\EntityCoder();
+        $this->_filter = new EntityCoder();
     }
 
     public function testSetUnknownEntityReferenceThrowException()
@@ -55,6 +57,11 @@ class EntityCoderTest extends \PHPUnit_Framework_TestCase
     }
 
     // encode
+
+    public function testEncodeEmptyString()
+    {
+        $this->assertSame('', $this->_filter->encode(''));
+    }
 
     public function testEncodeSpecialCharsToNumericEntities()
     {
@@ -123,6 +130,11 @@ class EntityCoderTest extends \PHPUnit_Framework_TestCase
 
     // decode
 
+    public function testDecodeEmptyString()
+    {
+        $this->assertSame('', $this->_filter->decode(''));
+    }
+
     public function testDecodeHexEntities()
     {
         $input    = '&#x3c;a&#x3e; &#x3c;&#x62;&#x3e; &#x3c;c&#x3e;';
@@ -135,6 +147,15 @@ class EntityCoderTest extends \PHPUnit_Framework_TestCase
     {
         $input    = '&#60;a&#62; &#60;&#98;&#62; &#60;c&#62;';
         $expected = '<a> <b> <c>';
+        $actual   = $this->_filter->decode($input);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testDecodeInvalidNumEntityWithActionIgnore()
+    {
+        $this->_filter->setInvalidEntityAction(EntityCoder::ACTION_IGNORE);
+        $input    = '&#80000000;';
+        $expected = '';
         $actual   = $this->_filter->decode($input);
         $this->assertEquals($expected, $actual);
     }
