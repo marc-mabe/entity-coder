@@ -154,10 +154,50 @@ class EntityCoderTest extends \PHPUnit_Framework_TestCase
     public function testDecodeInvalidNumEntityWithActionIgnore()
     {
         $this->_filter->setInvalidEntityAction(EntityCoder::ACTION_IGNORE);
-        $input    = '&#80000000;';
+        $input    = '&#2147483648;';
         $expected = '';
         $actual   = $this->_filter->decode($input);
         $this->assertEquals($expected, $actual);
+    }
+
+    public function testDecodeInvalidNumEntityWithActionEntity()
+    {
+        $this->_filter->setInvalidEntityAction(EntityCoder::ACTION_ENTITY);
+        $input    = '&#2147483648;';
+        $expected = '&#2147483648;';
+        $actual   = $this->_filter->decode($input);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testDecodeInvalidNumEntityWithActionSubstitude()
+    {
+        $this->_filter->setInvalidEntityAction(EntityCoder::ACTION_SUBSTITUTE);
+        $this->_filter->setSubstitute('?');
+        $input    = '&#2147483648;';
+        $expected = '?';
+        $actual   = $this->_filter->decode($input);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testDecodeInvalidNumEntityWithActionCallback()
+    {
+        $this->_filter->setInvalidEntityAction(EntityCoder::ACTION_CALLBACK);
+        $this->_filter->setInvalidEntityCallback(function ($entity) {
+            return '_' . $entity . '_';
+        });
+        $input    = '&#2147483648;';
+        $expected = '_&#2147483648;_';
+        $actual   = $this->_filter->decode($input);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testDecodeInvalidNumEntityWithActionException()
+    {
+        $this->_filter->setInvalidEntityAction(EntityCoder::ACTION_EXCEPTION);
+        $input    = '&#2147483648;';
+
+        $this->setExpectedException('EntityCoder\InvalidEntityException');
+        $this->_filter->decode($input);
     }
 
     public function testDecodeKeepSpecial()

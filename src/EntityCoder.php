@@ -495,6 +495,32 @@ class EntityCoder
     }
 
     /**
+     * Set the callback for invalid entities.
+     *
+     * @param null|callable $callback
+     * @return $this
+     * @throws InvalidArgumentException If an invalid callback was given.
+     */
+    public function setInvalidEntityCallback($callback)
+    {
+        if ($callback !== null && !is_callable($callback)) {
+            throw new InvalidArgumentException('Invalid calllback given');
+        }
+
+        $this->_invalidEntityCallback = $callback;
+    }
+
+    /**
+     * Get the callback for invalid entities.
+     *
+     * @return null|callable
+     */
+    public function getInvalidEntityCallback()
+    {
+        return $this->_invalidEntityCallback;
+    }
+
+    /**
      * Set the action which is done if an invalid or unknown entity was detected.
      *
      * @param string $action Value of EntityCoder::INVALID_ENTITY_*
@@ -608,7 +634,7 @@ class EntityCoder
 
     protected function _encodeMultibyteMatches(array $matches)
     {
-        $char = &$matches[1];
+        $char = $matches[1];
 
         if ( ($outputEncoding = $this->getOutputCharSet()) != 'UTF-8') {
             $conv = (string)@iconv('UTF-8', $this->getOutputCharSet() . '//IGNORE', $char);
@@ -630,13 +656,9 @@ class EntityCoder
     {
         $text = $this->_inputToUtf8($text);
 
-        // decode hex entities
-        $pattern = '/&#x([a-f0-9]+);/i';
-        $text    = preg_replace_callback($pattern, array($this, '_filterHexEntityMatches'), $text);
-
         // decode numeric entities
-        $pattern = '/&#([0-9]+);/';
-        $text    = preg_replace_callback($pattern, array($this, '_filterNumEntityMatches'), $text);
+        $pattern = '/&#(x(?:[a-f\d])+|\d+);/i';
+        $text    = preg_replace_callback($pattern, array($this, '_decodeNumEntityMatches'), $text);
 
         // prepare entity reference
         $entRef = $this->getEntityReference();
@@ -656,85 +678,39 @@ class EntityCoder
             $entValue = $entFilter->decode($entValue);
         }
 
-        $text = strtr($text, $entRef);
-
-        $text = $this->_utf8ToOutput($text);
-
-        return $text;
+        return $this->_utf8ToOutput(strtr($text, $entRef));
     }
 
-    protected function _filterNumEntityMatches(array $matches) {
-        $unicode = (int)$matches[1];
+    protected function _decodeNumEntityMatches(array $match)
+    {
+        $unicode = ($match[1][0] === 'x') ? hexdec(substr($match[1], 1)) : (int)$match[1];
 
         if ($this->getKeepSpecial()
-          && ( $unicode == 34 // "
-            || $unicode == 38 // &
-            || $unicode == 39 // '
-            || $unicode == 60 // <
-            || $unicode == 62 // >
-          )
+            && ($unicode == 34    // "
+                || $unicode == 38 // &
+                || $unicode == 39 // '
+                || $unicode == 60 // <
+                || $unicode == 62 // >
+            )
         ) {
-            return $matches[0]; // return entity
+            return $match[0]; // return entity
         }
 
         $char = $this->_unicodeToUtf8($unicode);
-        if ($char === '') {
+        if ($char === false) {
             switch ($this->getInvalidEntityAction()) {
                 case self::ACTION_CALLBACK:
                 case self::ACTION_TRANSLIT_CALLBACK:
                     $callback = $this->getInvalidEntityCallback();
-                    return call_user_func($callback, $matches[0]);
+                    return call_user_func($callback, $match[0]);
 
                 case self::ACTION_ENTITY:
                 case self::ACTION_TRANSLIT_ENTITY:
-                    return $matches[0];
+                    return $match[0];
 
                 case self::ACTION_EXCEPTION:
                 case self::ACTION_TRANSLIT_EXCEPTION:
-                    throw new InvalidEntityException("Invalid entity {$matches[0]} found");
-
-                case self::ACTION_IGNORE:
-                case self::ACTION_TRANSLIT_IGNORE:
-                    return '';
-
-                case self::ACTION_SUBSTITUTE:
-                case self::ACTION_TRANSLIT_SUBSTITUTE:
-                    return $this->getSubstitute();
-            }
-        }
-
-        return $char;
-    }
-
-    protected function _filterHexEntityMatches(array $matches) {
-        $unicode = hexdec($matches[1]);
-
-        if ($this->getKeepSpecial()
-          && ( $unicode == 34 // "
-            || $unicode == 38 // &
-            || $unicode == 39 // '
-            || $unicode == 60 // <
-            || $unicode == 62 // >
-          )
-        ) {
-            return $matches[0];
-        }
-
-        $char = $this->_unicodeToUtf8($unicode);
-        if ($char === '') {
-            switch ($this->getInvalidEntityAction()) {
-                case self::ACTION_CALLBACK:
-                case self::ACTION_TRANSLIT_CALLBACK:
-                    $callback = $this->getInvalidEntityCallback();
-                    return call_user_func($callback, $matches[0]);
-
-                case self::ACTION_ENTITY:
-                case self::ACTION_TRANSLIT_ENTITY:
-                    return $matches[0];
-
-                case self::ACTION_EXCEPTION:
-                case self::ACTION_TRANSLIT_EXCEPTION:
-                    throw new InvalidEntityException("Invalid entity {$matches[0]} found");
+                    throw new InvalidEntityException("Invalid entity {$match[0]} found");
 
                 case self::ACTION_IGNORE:
                 case self::ACTION_TRANSLIT_IGNORE:
