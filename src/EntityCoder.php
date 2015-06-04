@@ -193,7 +193,7 @@ class EntityCoder
             'lrm'     => "\xe2\x80\x8e", 'rlm'   => "\xe2\x80\x8f",
             'ndash'   => "\xe2\x80\x93", 'mdash' => "\xe2\x80\x94",
             'lsquo'   => "\xe2\x80\x98", 'rsquo' => "\xe2\x80\x99",
-            'sbquo'   => "\xe2\x80\x9a", // 'bsquo' => "\xe2\x80\x9a",
+            'sbquo'   => "\xe2\x80\x9a",
             'ldquo'   => "\xe2\x80\x9c", 'rdquo' => "\xe2\x80\x9d",
             'bdquo'   => "\xe2\x80\x9e",
             'dagger'  => "\xe2\x80\xa0", 'Dagger' => "\xe2\x80\xa1",
