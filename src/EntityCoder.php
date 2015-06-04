@@ -284,9 +284,7 @@ class EntityCoder
     /**
      * Sets filter options
      *
-     * @param  integer|array $quoteStyle
-     * @param  string  $charSet
-     * @return void
+     * @param array $options Associative array or options ... see setter and getter
      */
     public function __construct($options = array())
     {
@@ -836,6 +834,7 @@ class EntityCoder
             case self::ACTION_TRANSLIT_IGNORE:
             case self::ACTION_TRANSLIT_SUBSTITUTE:
                 $iconvTo = 'UTF-8//TRANSLIT//IGNORE';
+                break;
             default:
                 $iconvTo = 'UTF-8//IGNORE';
         }
