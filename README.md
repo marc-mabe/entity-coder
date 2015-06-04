@@ -1,5 +1,5 @@
-EntityCoder
-===========
+entity-coder
+============
 
 FEATURES
 --------
@@ -11,8 +11,7 @@ FEATURES
   * selectable if hex or decimal entities will be used (on encode)
   * selectable how to handle characters/entities which are not convertable to given output charset
   * selectable how to handle invalid characters
-  
-  ACTIONS:
+  * **ACTIONS:**
     * throw exception
     * call callback
     * ignore
@@ -21,19 +20,68 @@ FEATURES
     * translit by ASCII name 
 
 
+Usage
+-----
+
+**Encode**
+```php
+$entityCoder = new EntityCoder(array(
+    // set named entity reference
+    // -> 'special', 'xml', 'html' or an array of your own entities
+    'entityReference' => 'special',
+
+    // set your input charset (default: ISO-8859-1)
+    'inputCharSet' => 'UTF-8',
+
+    // set your output charset (default: ISO-8859-1)
+    'outputCharSet' => 'ISO-8859-15',
+
+    // convert to hex entities if no named entity exists (default: false)
+    'hex' => true,
+));
+
+$text = $entityCoder->encode($text);
+```
+
+**Decode**
+```php
+$entityCoder = new EntityCoder(array(
+    // set named entity reference
+    // -> 'special', 'xml', 'html' or an array of your own entities
+    'entityReference' => 'html',
+
+    // set your input charset (default: ISO-8859-1)
+    'inputCharSet' => 'ISO-8859-15',
+
+    // set your output charset (default: ISO-8859-1)
+    'outputCharSet' => 'ASCII',
+
+    // How to handle invalid characters
+    // EXCEPTION  = throw an exception
+    // CALLBACK   = call a callback
+    // IGNORE     = replace by an empty character
+    // SUBSTITUTE = substitute by an substitution character (default: "?")
+    // TRANSLIT_* = convert to ASCII name with a fallback to one of the other actions
+    'invalidCharAction' => EntityCoder::ACTION_SUBSTITUTE,
+
+    // How to handle invalid entities
+    // EXCEPTION  = throw an exception
+    // CALLBACK   = call a callback
+    // IGNORE     = replace by an empty character
+    // SUBSTITUTE = substitute by an substitution character (default: "?")
+    // ENTITY     = leave the entity as-is
+    'invalidEntityAction' => EntityCoder::ACTION_ENTITY,
+));
+
+$text = $entityCoder->decode($text);
+```
+
+
 REQUIREMENTS
 ------------
 
 This library requires PHP 5.3.0 or later.
 Additionally the php extension iconv is needed. (enabled by default)
-
-
-DOCUMENTATION
--------------
-
-Online documentation can be found at:
-
-https://github.com/marc-mabe/entity-coder/wiki.
 
 
 ISSUES AND FEEDBACK
