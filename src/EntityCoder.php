@@ -247,7 +247,7 @@ class EntityCoder
     /**
      * The action if an entity can't convert to the given charset
      *
-     * @var string Value of EntityCoder\EntityCoder::ACTION_*
+     * @var string Value of EntityCoder::ACTION_*
      */
     protected $_invalidCharAction = self::ACTION_IGNORE;
 
@@ -255,14 +255,14 @@ class EntityCoder
      * The callback called on invalid characters
      * if invalid_char_action is set to callback.
      *
-     * @var null|callback
+     * @var null|callable
      */
-    protected $_invalidCharCallback = null;
+    protected $_invalidCharCallback;
 
     /**
      * The action if an invalid or unknown entity was detected on decode.
      *
-     * @var string Value of EntityCoder\EntityCoder::ACTION_*
+     * @var string Value of EntityCoder::ACTION_*
      */
     protected $_invalidEntityAction = self::ACTION_ENTITY;
 
@@ -270,9 +270,9 @@ class EntityCoder
      * The callback called on decode invalid entities
      * if invalid_entity_action is set to callback.
      *
-     * @var null|callback
+     * @var null|callable
      */
-    protected $_invalidEntityCallback = null;
+    protected $_invalidEntityCallback;
 
     /**
      * The substituting character used with one of the substitute action
@@ -313,7 +313,7 @@ class EntityCoder
      * Set input character set.
      *
      * @param  string $enc
-     * @return EntityCoder\EntityCoder Provides a fluent interface
+     * @return $this
      */
     public function setInputCharSet($enc)
     {
@@ -335,7 +335,7 @@ class EntityCoder
      * Set output character set.
      *
      * @param  string $enc
-     * @return EntityCoder\EntityCoder Provides a fluent interface
+     * @return $this
      */
     public function setOutputCharSet($enc)
     {
@@ -359,7 +359,7 @@ class EntityCoder
      *    or:  name of a predefined entity reference
      *
      * @param array|string $entityReference Entity reference.
-     * @return EntityCoder\EntityCoder Provides a fluent interface
+     * @return $this
      */
     public function setEntityReference($entityReference) {
         if (is_string($entityReference)) {
@@ -372,8 +372,8 @@ class EntityCoder
         } else {
             throw new InvalidArgumentException(
                 'Invalid entity reference: must be an array '
-              . 'or one of the predefined entity references: '
-              . implode(', ', array_keys(self::$_entityReferences))
+                . 'or one of the predefined entity references: '
+                . implode(', ', array_keys(self::$_entityReferences))
             );
         }
 
@@ -393,7 +393,7 @@ class EntityCoder
      * Sets the hex option.
      *
      * @param bool $flag
-     * @return EntityCoder\EntityCoder Provides a fluent interface
+     * @return $this
      */
     public function setHex($flag) {
         $this->_hex = (bool)$flag;
@@ -414,7 +414,7 @@ class EntityCoder
      * Sets keep special option
      *
      * @param bool $flag
-     * @return EntityCoder\EntityCoder Provides a fluent interface
+     * @return $this
      */
     public function setKeepSpecial($flag)
     {
@@ -425,7 +425,7 @@ class EntityCoder
     /**
      * Get the action which is done if an invalid character was detected.
      *
-     * @return string Value of EntityCoder\EntityCoder::INVALID_CHAR_*
+     * @return string Value of EntityCoder::INVALID_CHAR_*
      */
     public function getInvalidCharAction()
     {
@@ -435,8 +435,8 @@ class EntityCoder
     /**
      * Set the action which is done if an invalid character was detected.
      *
-     * @param string $action The action to set - value of EntityCoder\EntityCoder::INVALID_CHAR_*
-     * @return EntityCoder\EntityCoder Provides a fluent interface
+     * @param string $action The action to set - value of EntityCoder::INVALID_CHAR_*
+     * @return $this
      * @throws EntityCoder\InvalidArgumentException If an unknown $action was given.
      */
     public function setInvalidCharAction($action)
@@ -461,7 +461,7 @@ class EntityCoder
     /**
      * Get the callback for invalid characters.
      *
-     * @return null|callback
+     * @return null|callable
      */
     public function getInvalidCharCallback()
     {
@@ -471,9 +471,9 @@ class EntityCoder
     /**
      * Set the callback for invalid characters.
      *
-     * @param null|callback $callback
-     * @return EntityCoder\EntityCoder Provides a fluent interface
-     * @throws EntityCoder\InvalidArgumentException If an invalid callback was given.
+     * @param null|callable $callback
+     * @return $this
+     * @throws InvalidArgumentException If an invalid callback was given.
      */
     public function setInvalidCharCallback($callback)
     {
@@ -487,7 +487,7 @@ class EntityCoder
     /**
      * Get the action which is done if an invalid or unknown entity was detected.
      *
-     * @return string Value of EntityCoder\EntityCoder::INVALID_ENTITY_*
+     * @return string Value of EntityCoder::INVALID_ENTITY_*
      */
     public function getInvalidEntityAction()
     {
@@ -497,9 +497,9 @@ class EntityCoder
     /**
      * Set the action which is done if an invalid or unknown entity was detected.
      *
-     * @param string $action Value of EntityCoder\EntityCoder::INVALID_ENTITY_*
-     * @return EntityCoder\EntityCoder Provides a fluent interface
-     * @throws EntityCoder\InvalidArgumentException If an unknown $action was given.
+     * @param string $action Value of EntityCoder::INVALID_ENTITY_*
+     * @return $this
+     * @throws InvalidArgumentException If an unknown $action was given.
      */
     public function setInvalidEntityAction($action)
     {
@@ -536,7 +536,7 @@ class EntityCoder
      * Set the substituting string.
      *
      * @param string $substitute
-     * @return EntityCoder\EntityCoder Provides a fluent interface
+     * @return $this
      */
     public function setSubstitute($substitute) {
         $this->_substitute = (string)$substitute;
@@ -644,13 +644,7 @@ class EntityCoder
         if ($this->getKeepSpecial()) {
             // do not decode special entities
             // TODO: remove by value not by key
-            unset(
-                $entRef['amp'],
-                $entRef['lt'],
-                $entRef['gt'],
-                $entRef['quot'],
-                $entRef['apos']
-            );
+            unset($entRef['amp'], $entRef['lt'], $entRef['gt'], $entRef['quot'], $entRef['apos']);
         }
 
         // decode entity values
@@ -755,11 +749,21 @@ class EntityCoder
         return $char;
     }
 
+    /**
+     * Convert an unicode into an entity
+     * @param int $code
+     * @return string
+     */
     protected function _unicodeToEntity($code)
     {
         return ($this->_hex === false) ? '&#' . $code . ';' : '&#x' . dechex($code) . ';';
     }
 
+    /**
+     * Convert an UTF-8 character into unicode
+     * @param string $char
+     * @return int
+     */
     protected function _utf8ToUnicode($char)
     {
         $ord0 = ord($char[0]); // first byte
@@ -785,6 +789,11 @@ class EntityCoder
         return $unicode;
     }
 
+    /**
+     * Convert an unicode into an UTF-8 character
+     * @param int $unicode
+     * @return string
+     */
     protected function _unicodeToUtf8($unicode) {
         if ($unicode < 0x80) {
             return chr($unicode);
@@ -821,6 +830,11 @@ class EntityCoder
         return false;
     }
 
+    /**
+     * Convert the input string into UTF-8
+     * @param string $input
+     * @return string
+     */
     protected function _inputToUtf8($input)
     {
         if ($input === '' || ($from = $this->getInputCharSet()) == 'UTF-8') {
@@ -843,6 +857,11 @@ class EntityCoder
         return (string)@iconv($from, $iconvTo, $input);
     }
 
+    /**
+     * Convert an UTF-8 string into the output encoding
+     * @param string $utf8
+     * @return string
+     */
     protected function _utf8ToOutput($utf8)
     {
         $to = $this->getOutputCharSet();
@@ -901,6 +920,12 @@ class EntityCoder
         return $outStr;
     }
 
+    /**
+     * Helper function will be called on an invalid character
+     * @param string $char
+     * @return string The replacement string
+     * @throws InvalidCharacterException
+     */
     protected function _handleInvalidChar($char)
     {
         $invalidCharAction = $this->getInvalidCharAction();
