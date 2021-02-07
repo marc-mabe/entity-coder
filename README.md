@@ -1,10 +1,9 @@
 entity-coder
 ============
 
-[![Build Status](https://secure.travis-ci.org/marc-mabe/entity-coder.png?branch=master)](http://travis-ci.org/marc-mabe/entity-coder)
-[![Quality Score](https://scrutinizer-ci.com/g/marc-mabe/entity-coder/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/marc-mabe/entity-coder/?branch=master)
-[![Code Coverage](https://scrutinizer-ci.com/g/marc-mabe/entity-coder/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/marc-mabe/entity-coder/?branch=master)
-[![Dependency Status](https://www.versioneye.com/php/marc-mabe:entity-coder/dev-master/badge.png)](https://www.versioneye.com/php/marc-mabe:entity-coder/dev-master)
+# !!! ARCHIVED !!!
+# THIS REPOSITORY HAS BEEN ARCHIVED WITHOUT ANY REPLACEMENT
+
 
 Encode & decode XML, HTML and own defined entities into different charsets.
 
